@@ -436,9 +436,13 @@ class MLP(Layer):
 
         self.seed = seed
 
-        assert isinstance(layers, list)
-        assert all(isinstance(layer, Layer) for layer in layers)
-        assert len(layers) >= 1
+        
+        if not isinstance(layers, list):
+            raise ValueError("Layers must be a list of Layers")
+        if len(layers) < 1:
+            raise ValueError("MLP must have at least one layer")
+        if not all(isinstance(layer, Layer) for layer in layers):
+            raise ValueError("All layers must be of type Layer")
 
         self.layer_name = layer_name
 
