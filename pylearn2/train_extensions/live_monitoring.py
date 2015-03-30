@@ -239,7 +239,7 @@ class LiveMonitoring(TrainExtension):
                         result[channel_name] = chan
                     else:
                         result[channel_name] = KeyError(
-                            'Invalid channel: %s' % rsp_msg.channel
+                            'Invalid channel: %s' % channel_name
                         )
                 rsp_msg.data = result
 
@@ -357,11 +357,14 @@ class LiveMonitor(object):
         if not pyplot_available:
             raise ImportError('pyplot needs to be installed for '
                               'this functionality.')
-        plt.clf()
         plt.ion()
+        plt.show()
+        plt.clf()
+        plt.pause(0.1)
         while True:
-            self.update_channel(channel_list)
+            self.update_channels(channel_list)
             plt.clf()
+            plt.hold(True)
             for channel_name in self.channels:
                 plt.plot(
                     self.channels[channel_name].epoch_record,
@@ -369,5 +372,5 @@ class LiveMonitor(object):
                     label=channel_name
                 )
             plt.legend()
-            plt.ion()
             plt.draw()
+            plt.pause(0.1)
