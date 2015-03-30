@@ -1976,18 +1976,22 @@ class Linear(Layer):
 
         rng = self.mlp.rng
         if self.irange is not None:
-            assert self.istdev is None
-            assert self.sparse_init is None
+            if self.sparse_init is not None:
+                raise ValueError("sparse_init must be None")
+            if self.istdev is not None:
+                raise ValueError("istdev must be None")
             W = rng.uniform(-self.irange,
                             self.irange,
                             (self.input_dim, self.dim)) * \
                 (rng.uniform(0., 1., (self.input_dim, self.dim))
                  < self.include_prob)
         elif self.istdev is not None:
-            assert self.sparse_init is None
+            if self.sparse_init is not None:
+                raise ValueError("sparse_init must be None")
             W = rng.randn(self.input_dim, self.dim) * self.istdev
         else:
-            assert self.sparse_init is not None
+            if self.sparse_init is None:
+                raise ValueError("sparse_init must be defined")
             W = np.zeros((self.input_dim, self.dim))
 
             def mask_rejects(idx, i):
@@ -2010,7 +2014,8 @@ class Linear(Layer):
         self.transformer = MatrixMul(W)
 
         W, = self.transformer.get_params()
-        assert W.name is not None
+        if W.name is None:
+            raise ValueError("name was None")
 
         if self.mask_weights is not None:
             expected_shape = (self.input_dim, self.dim)
